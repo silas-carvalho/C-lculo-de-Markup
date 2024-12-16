@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Dec 15 14:36:20 2024
+Created on Sun Dec 15 22:42:10 2024
 
 @author: Silas Carvalho
 
@@ -41,10 +41,12 @@ def input_decimal(mensagem):
             valor_str = input(mensagem).replace(',', '.')
             valor = Decimal(valor_str)
             if valor < 0:
-                raise ValueError("O valor não pode ser negativo.")
-            return valor
+                print(f"{Fore.RED}O valor não pode ser negativo.{Style.RESET_ALL}")
+                continue  # Volta para o início do loop
+            return valor  # Saída do loop, entrada válida
         except (ValueError, InvalidOperation) as e:
-            print(f"{Fore.RED}Por favor, insira um número válido. Erro: {e}")
+            print(f"{Fore.RED}Por favor, insira um número válido. Erro: {e}{Style.RESET_ALL}")
+            continue  # Volta para o início do loop
 
 def input_int(mensagem):
     while True:
@@ -70,6 +72,18 @@ def print_section(title):
     print(f"\n{line}")
     print(f"   {title}")
     print(line)
+
+def calcular_taxa_cartao(preco_venda, tipo):
+    print_section(f"PREÇO IDEAL SUGERIDO ({tipo.upper()})")
+    taxa_cartao_percent = input_decimal("Digite a taxa de cartão (%): ")
+    while taxa_cartao_percent > 100 or taxa_cartao_percent < 0:
+        print("Por favor, insira um percentual válido entre 0 e 100.")
+        taxa_cartao_percent = input_decimal("Digite a taxa de cartão (%): ")
+    valor_taxa_cartao = round_decimal(preco_venda * (taxa_cartao_percent / 100))
+    preco_ideal_sugerido = round_decimal(preco_venda + valor_taxa_cartao)
+
+    print(f"Taxas de cartão: {taxa_cartao_percent}% \tR$ {valor_taxa_cartao:.2f}")
+    print(f"Preço com Tx de cartão: R$ {preco_ideal_sugerido:.2f}")
 
 def calcular_precos():
     while True:
@@ -110,16 +124,7 @@ def calcular_precos():
 
         incluir_taxa_cartao_markup = input_s_n("\nDeseja incluir a taxa de cartão para o markup? (s/n): ")
         if incluir_taxa_cartao_markup == 's':
-            taxa_cartao_percent_markup = input_decimal("Digite a taxa de cartão (%): ")
-            while taxa_cartao_percent_markup > 100 or taxa_cartao_percent_markup < 0:
-                print("Por favor, insira um percentual válido entre 0 e 100.")
-                taxa_cartao_percent_markup = input_decimal("Digite a taxa de cartão (%): ")
-            valor_taxa_cartao_markup = round_decimal(preco_venda * (taxa_cartao_percent_markup / 100))
-            preco_ideal_sugerido_markup = round_decimal(preco_venda + valor_taxa_cartao_markup)
-
-            print_section("PREÇO IDEAL SUGERIDO (MARKUP)")
-            print(f"Taxas de cartão: {taxa_cartao_percent_markup}% \tR$ {valor_taxa_cartao_markup:.2f}")
-            print(f"Preço com Tx de cartão: R$ {preco_ideal_sugerido_markup:.2f}")
+            calcular_taxa_cartao(preco_venda, 'markup')
 
         calcular_margem = input_s_n("\nDeseja calcular a margem de lucro com outro preço de venda? (s/n): ")
         if calcular_margem == 's':
@@ -133,24 +138,15 @@ def calcular_precos():
 
             incluir_taxa_cartao_margem = input_s_n("\nDeseja incluir a taxa de cartão para a margem? (s/n): ")
             if incluir_taxa_cartao_margem == 's':
-                taxa_cartao_percent_margem = input_decimal("Digite a taxa de cartão (%): ")
-                while taxa_cartao_percent_margem > 100 or taxa_cartao_percent_margem < 0:
-                    print("Por favor, insira um percentual válido entre 0 e 100.")
-                    taxa_cartao_percent_margem = input_decimal("Digite a taxa de cartão (%): ")
-                valor_taxa_cartao_margem = round_decimal(preco_venda_usuario * (taxa_cartao_percent_margem / 100))
-                preco_ideal_sugerido_margem = round_decimal(preco_venda_usuario + valor_taxa_cartao_margem)
+                calcular_taxa_cartao(preco_venda_usuario, 'margem')
 
-                print_section("PREÇO IDEAL SUGERIDO (MARGEM)")
-                print(f"Taxas de cartão: {taxa_cartao_percent_margem}% \tR$ {valor_taxa_cartao_margem:.2f}")
-                print(f"Preço com Tx de cartão: R$ {preco_ideal_sugerido_margem:.2f}")
-
-        print_section("COMPARAÇÃO FINAL")
-        print(f"Preço de Venda (Markup): R$ {preco_venda:.2f}")
-        print(f"Preço de Venda (Margem): R$ {preco_venda_usuario:.2f}")
-        print(f"Lucro Bruto (Markup): R$ {lucro_bruto:.2f}")
-        print(f"Lucro Bruto (Margem): R$ {lucro_bruto_usuario:.2f}")
-        print(f"{Fore.LIGHTGREEN_EX}Margem de Lucro (calculada com o preço de venda inicial): {margem:.2f}%{Style.RESET_ALL}")
-        print(f"{Fore.LIGHTYELLOW_EX}Margem de Lucro (Preço de Venda Alternativo): {margem_usuario:.2f}%{Style.RESET_ALL}")
+            print_section("COMPARAÇÃO FINAL")
+            print(f"Preço de Venda (Markup): R$ {preco_venda:.2f}")
+            print(f"Preço de Venda (Margem): R$ {preco_venda_usuario:.2f}")
+            print(f"Lucro Bruto (Markup): R$ {lucro_bruto:.2f}")
+            print(f"Lucro Bruto (Margem): R$ {lucro_bruto_usuario:.2f}")
+            print(f"{Fore.LIGHTGREEN_EX}Margem de Lucro (calculada com o preço de venda inicial): {margem:.2f}%{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTYELLOW_EX}Margem de Lucro (Preço de Venda Alternativo): {margem_usuario:.2f}%{Style.RESET_ALL}")
 
         repetir = input_s_n("\nDeseja fazer outro cálculo? (s/n): ")
         if repetir != 's':
@@ -158,4 +154,10 @@ def calcular_precos():
             break
 
 calcular_precos()
+
+
+
+
+
+
 
